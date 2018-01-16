@@ -8,14 +8,14 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # 由于tf内部是由c++运行, 所以当然py的变量是不行的
 W = tf.Variable(0.1, dtype=tf.float32)
 b = tf.Variable(-0.1, dtype=tf.float32)
-# 声明tf占位符, 类似算式中的变量, 但比`变量`这个概念更抽象, 占位符可以是一个数组或者另一个算式
+# 声明tf占位符, 类似算式中的变量, 但比`变量`这个概念更抽象
 x = tf.placeholder(tf.float32)
 # 得到一个线性模型, 也就是算式 y=W*x+b, 可以得到x与y的关系
 linear_model = W * x + b
-# 开启会话, 也就是开启一个`图`, 他是c++与py之间的桥梁, c++运行的就是这个
+# 开启会话, 也就是开启一个`图`, 他是c++与py之间数据转换的桥梁, c++运行的就是这个
 sess = tf.Session()
 
-# 需要显示初始化变量
+# 需要显式的初始化变量
 init = tf.global_variables_initializer()
 # 在图上运行这个初始化变量方法
 sess.run(init)
