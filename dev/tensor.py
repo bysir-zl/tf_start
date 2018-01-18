@@ -4,7 +4,10 @@ import tensorflow as tf
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
+# 注意啊 在tf声明矩阵的时候, 第一个参数是列, 第二个数行
+# [5,3]
 x = tf.Variable([[1., 1., 1], [2., 2., 1], [2., 2., 1], [2., 2., 1], [2., 2., 1]])
+# [3,2]
 w1 = tf.Variable([[1., 1], [2., 2], [2., 2]])
 
 init = tf.global_variables_initializer()
@@ -14,7 +17,8 @@ sess.run(init)
 # 乘法
 
 # 第一个矩阵的列数必须等于第二个矩阵的行数, 乘积是 第二个矩阵的列数*第一个矩阵的行数的矩阵
-# [3*5] * [2*3] = [5*2]
+# [3*5] * [2*3] = [2*5]
+# [5,3] * [3,2] = [5,2]
 y = tf.matmul(x, w1)
 print(sess.run(x))
 print("*")
@@ -38,3 +42,17 @@ yy = y_ + w2
 print("=")
 
 print(sess.run(yy))
+
+print("直接相乘")
+
+a = tf.Variable([[1., 1., 1], [2., 2., 1]])
+b = tf.Variable([[1., 1., 1], [2., 2., 1]])
+
+init = tf.global_variables_initializer()
+sess.run(init)
+
+print(sess.run(a))
+print("*")
+print(sess.run(b))
+print("=")
+print(sess.run(a * b))
