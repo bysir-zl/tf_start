@@ -54,14 +54,16 @@ init = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init)
 
-for i in range(1):
+for i in range(1000):
     batch_xs, batch_ys = mnist.train.next_batch(100)
     sess.run(train_step, {x: batch_xs, y_: batch_ys})
 
-print(sess.run(y))
-print(sess.run(b))
-
+# argmax: 最大的那个数值所在的下标
 correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
 
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 print(sess.run(accuracy, {x: mnist.test.images, y_: mnist.test.labels}))
+
+# 计算test里第一个图片的数值
+out = tf.argmax(y, 1)
+print(sess.run(out, {x: mnist.test.images}))
