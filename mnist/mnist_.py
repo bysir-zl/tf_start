@@ -66,4 +66,4 @@ print(sess.run(accuracy, {x: mnist.test.images, y_: mnist.test.labels}))
 
 # 计算test里第一个图片的数值
 out = tf.argmax(y, 1)
-print(sess.run(out, {x: mnist.test.images}))
+print(sess.run(out, {x: mnist.test.images[:1]}))
