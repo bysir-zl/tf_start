@@ -13,7 +13,8 @@ x = tf.placeholder(tf.float32)
 # 得到一个线性模型, 也就是算式 y=W*x+b, 可以得到x与y的关系
 linear_model = W * x + b
 # 开启会话, 也就是开启一个`图`, 他是c++与py之间数据转换的桥梁, c++运行的就是这个
-sess = tf.Session()
+
+sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 
 # 需要显式的初始化变量
 init = tf.global_variables_initializer()
