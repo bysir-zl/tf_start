@@ -26,7 +26,9 @@ def conv2d(x, W):
     #   具体含义是[卷积核的高度，卷积核的宽度，图像通道数，卷积核个数]，要求类型与参数input相同，
     #   有一个地方需要注意，第三维in_channels，等于input参数的第四维
     # 3 第三个参数strides：卷积时在图像每一维的步长，这是一个一维的向量，长度4
-    # 4 第四个参数padding：string类型的量，只能是"SAME","VALID"其中之一，这个值决定了不同的卷积方式（后面会介绍）
+    # 4 第四个参数padding：string类型的量，只能是"SAME","VALID"其中之一，这个值决定了不同的卷积方式
+    #   当padding=SAME时，输入与输出形状相同
+    #   padding是VALID时,输出的宽高为 (图片大小-filter大小)/步长+1
     # 5 第五个参数：use_cudnn_on_gpu:bool类型，是否使用cudnn加速，默认为true
     # 结果返回一个Tensor，这个输出，就是我们常说的feature map，shape仍然是[batch, height, width, channels]这种形式。
     return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
