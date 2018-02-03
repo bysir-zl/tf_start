@@ -90,14 +90,18 @@ b_fc1 = bias_variable([1024])
 
 # 最后一层, 将前两层卷积的结果打扁成[None,7*7*64]
 h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])
+# 矩阵相乘, [None,7*7*64] * [7 * 7 * 64, 1024] => [None,1024]
 h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
 keep_prob = tf.placeholder("float")
+# dropout也是一个大杀器, 他能防止过拟合
+#  但它为何有效,却众说纷纭 (http://blog.csdn.net/stdcoutzyx/article/details/49022443)
 h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
 W_fc2 = weight_variable([1024, 10])
 b_fc2 = bias_variable([10])
 
+# [None,1024] * [1024,10] => [none,10] 也就是目标矩阵
 y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
 
 # y_ 目标矩阵
