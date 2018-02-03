@@ -17,6 +17,7 @@ input = tf.constant(0.1, shape=[1, 28, 28, 1])
 # padding: SAME, 结果shape尺寸计算如下:
 #   out_size = ceil(in_size / strides)
 #   为了得到这个尺寸, 函数会在max_pool之前向input填充必要的0
+#   最终大小与kernel无关
 # 比如这个 ceil(28/2) = 14
 y = tf.nn.max_pool(input, ksize=[1, 5, 5, 1], strides=[1, 2, 2, 1], padding='SAME')
 print(y.shape)

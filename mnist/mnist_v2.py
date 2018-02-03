@@ -68,7 +68,8 @@ x_image = tf.reshape(x, [-1, 28, 28, 1])
 h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
 # 一般卷积后会接一个池化, 池化操作会舍去一部分特征, 但是不会影响识别, 具体原因可以看这篇文章:
 #   CNN中的maxpool到底是什么原理？(http://www.techweb.com.cn/network/system/2017-07-13/2556494.shtml)
-# 池化操作一般有两种，一种是Avy Pooling,一种是max Pooling,如下：
+# 池化操作一般有两种，一种是Avy Pooling,一种是max Pooling,如下是max pooling
+# 步长为2 所以得到的是 [None,14,14,32]
 h_pool1 = max_pool_2x2(h_conv1)
 
 # ~第二层卷积~
@@ -76,12 +77,18 @@ h_pool1 = max_pool_2x2(h_conv1)
 W_conv2 = weight_variable([5, 5, 32, 64])
 b_conv2 = bias_variable([64])
 
+# [None,14,14,64]
 h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+# [None,7,7,64]
 h_pool2 = max_pool_2x2(h_conv2)
 
 W_fc1 = weight_variable([7 * 7 * 64, 1024])
 b_fc1 = bias_variable([1024])
 
+# ~ 我们最后还是要得到一个[10]的结果 代表0-9的几率 ~
+# 所以我们用一个权重矩阵去乘(这和基础版mnist一样)
+
+# 最后一层, 将前两层卷积的结果打扁成[None,7*7*64]
 h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])
 h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
