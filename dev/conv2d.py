@@ -35,7 +35,7 @@ filter = tf.constant(
     [  # 2
         [  # 2
             [  # 1
-                [1, 2, 1]  # 1
+                [1, 2, 1]  # 3
             ],
             [
                 [1, 2, 1]
@@ -51,8 +51,8 @@ filter = tf.constant(
         ]
     ], dtype=tf.float32)
 
-# 这里的padding是SAME, conv2d会自动填充input的形状 使得结果和输入形状相同
-y = tf.nn.conv2d(input, filter, strides=[1, 1, 1, 1], padding='SAME')
+# padding: SAME, 关于padding取值和影响的结果请看同级目录下 `padding.py`
+y = tf.nn.conv2d(input, filter, strides=[1, 2, 2, 1], padding='SAME')
 
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())

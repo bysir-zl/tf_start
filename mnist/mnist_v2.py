@@ -66,10 +66,12 @@ x_image = tf.reshape(x, [-1, 28, 28, 1])
 # 我们把x_image和权值向量进行卷积，加上偏置项，然后应用ReLU激活函数，最后进行max pooling
 # 这里得到的h_conv1是 [None,28,28,32]
 h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
+# 一般卷积后会接一个池化, 池化操作会舍去一部分特征, 但是不会影响识别, 具体原因可以看这篇文章:
+#   CNN中的maxpool到底是什么原理？(http://www.techweb.com.cn/network/system/2017-07-13/2556494.shtml)
+# 池化操作一般有两种，一种是Avy Pooling,一种是max Pooling,如下：
 h_pool1 = max_pool_2x2(h_conv1)
 
 # ~第二层卷积~
-
 
 W_conv2 = weight_variable([5, 5, 32, 64])
 b_conv2 = bias_variable([64])
