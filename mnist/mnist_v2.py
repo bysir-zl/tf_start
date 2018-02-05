@@ -54,7 +54,7 @@ W_conv1 = weight_variable([5, 5, 1, 32])
 # 而对于每一个输出通道都有一个对应的偏置量。
 b_conv1 = bias_variable([32])
 
-# 为了用这一层，我们把x变成一个4d向量，其第2、第3维对应图片的宽、高，最后一维代表图片的颜色通道数(因为是灰度图所以这里的通道数为1，如果是rgb彩色图，则为3)。
+# 由于卷积核池化都需要一个4D向量, 所以我们把x变成一个4d向量，其第2、第3维对应图片的宽、高，最后一维代表图片的颜色通道数(因为是灰度图所以这里的通道数为1，如果是rgb彩色图，则为3)。
 # 调整矩阵维度
 # 第1个参数为被调整维度的张量。
 # 第2个参数为要调整为的形状。
@@ -91,6 +91,7 @@ b_fc1 = bias_variable([1024])
 # 最后一层, 将前两层卷积的结果打扁成[None,7*7*64]
 h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])
 # 矩阵相乘, [None,7*7*64] * [7 * 7 * 64, 1024] => [None,1024]
+# ReLu=max(0,x)
 h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
 keep_prob = tf.placeholder("float")
@@ -119,6 +120,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 sess.run(tf.global_variables_initializer())
 for i in range(10):
     batch = mnist.train.next_batch(50)
+    # 每100次打印训练之前的这次数据的准确度
     if i % 100 == 0:
         train_accuracy = sess.run(accuracy, feed_dict={x: batch[0], y_: batch[1], keep_prob: 1.0})
         print("step %d, training accuracy %g" % (i, train_accuracy))
