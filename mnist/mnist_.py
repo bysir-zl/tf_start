@@ -50,13 +50,36 @@ cross_entropy = -tf.reduce_sum(y_ * y)
 # 梯度下降, 使cross_entropy最小, 也就是使y_和y最拟合
 train_step = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
 
-init = tf.global_variables_initializer()
 sess = tf.Session()
+
+init = tf.global_variables_initializer()
 sess.run(init)
+
+# 把cross添加到观测中
+tf.summary.scalar("cross", cross_entropy)
+
+correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+
+# 把accuracy添加到观测中
+tf.summary.scalar("accuracy", accuracy)
+
+# 获取所有监测的tensor
+merged = tf.summary.merge_all()
+summary_writer = tf.summary.FileWriter('z://tmp/mnist_logs', sess.graph)
 
 for i in range(1000):
     batch_xs, batch_ys = mnist.train.next_batch(100)
     sess.run(train_step, {x: batch_xs, y_: batch_ys})
+
+    # 观测的tensor也需要run
+    summary_str = sess.run(merged, {x: batch_xs, y_: batch_ys})
+
+    # 写入到指定目录里
+    # 查看需要借助tensorboard, 命令如下: tensorboard --logdir="z://tmp/mnist_logs"
+    summary_writer.add_summary(summary_str, i)
+
+# 计算识别测试集的准确度
 
 # argmax: 最大的那个数值所在的下标
 correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
