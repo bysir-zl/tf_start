@@ -7,11 +7,20 @@ from mnist import input_data
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 mnist = input_data.read_data_sets("data/", one_hot=True)
 
+batch_size = 100
+batch_num = mnist.train.num_examples // batch_size
 # 我们希望能够输入任意数量的MNIST图像，每一张图展平成784维的向量。我们用2维的浮点数张量来表示这些图，这个张量的形状是[None，784 ]。
 # 知识点: 这里的None表示此张量的第一个维度可以是任何长度的。
 x = tf.placeholder("float", [None, 784])
-W = tf.Variable(tf.zeros([784, 10]))
-b = tf.Variable(tf.zeros([10]))
+
+W = tf.Variable(tf.truncated_normal([784, 100], stddev=0.1))
+b = tf.Variable(tf.zeros([100]) + 0.1)
+L = tf.nn.tanh(tf.matmul(x, W) + b)
+
+W2 = tf.Variable(tf.truncated_normal([100, 10], stddev=0.1))
+b2 = tf.Variable(tf.zeros([10]) + 0.1)
+L2 = tf.nn.tanh(tf.matmul(L, W2) + b2)
+
 # 为了得到一张给定图片属于某个特定数字类的证据（evidence），我们对图片像素值进行加权求和。
 # 如果这个像素具有很强的证据说明这张图片不属于该类，那么相应的权值为负数，相反如果这个像素拥有有利的证据支持这张图片属于这个类，那么权值是正数。
 
@@ -26,7 +35,7 @@ b = tf.Variable(tf.zeros([10]))
 # [None,10] e.g:
 # [[0.1 0.9. 0. 0. 0. 0. 0. 0. 0. 0.]
 #  [0. 0. 0. 0. 0. 0. 0. 0.7 0.3 0.]]
-y = tf.nn.softmax(tf.matmul(x, W) + b)
+y = tf.nn.softmax(L2)
 
 # y_ 目标矩阵
 # [[0. 1. 0. 0. 0. 0. 0. 0. 0. 0.]
@@ -44,9 +53,8 @@ y_ = tf.placeholder("float", [None, 10])
 # [[1. 1. 1.]
 #  [4. 4. 1.]]
 
-# 由于y_只有一个1 所以要拟合的话 只需要y在相同位置上也是1,乘起来的话就能得到最大值
-# 相加, 取负值
-cross_entropy = -tf.reduce_sum(y_ * y)
+# 二次代价
+cross_entropy = tf.reduce_sum(tf.square(y - y_))
 # 梯度下降, 使cross_entropy最小, 也就是使y_和y最拟合
 train_step = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
 
@@ -68,16 +76,21 @@ tf.summary.scalar("accuracy", accuracy)
 merged = tf.summary.merge_all()
 summary_writer = tf.summary.FileWriter('z://tmp/mnist_logs', sess.graph)
 
-for i in range(1000):
-    batch_xs, batch_ys = mnist.train.next_batch(100)
-    sess.run(train_step, {x: batch_xs, y_: batch_ys})
+for i in range(10):
+    for batch in range(batch_num):
+        batch_xs, batch_ys = mnist.train.next_batch(batch_size)
+        sess.run(train_step, {x: batch_xs, y_: batch_ys})
 
-    # 观测的tensor也需要run
-    summary_str = sess.run(merged, {x: batch_xs, y_: batch_ys})
+        # 观测的tensor也需要run
+        summary_str = sess.run(merged, {x: batch_xs, y_: batch_ys})
 
-    # 写入到指定目录里
-    # 查看需要借助tensorboard, 命令如下: tensorboard --logdir="z://tmp/mnist_logs"
-    summary_writer.add_summary(summary_str, i)
+        # 写入到指定目录里
+        # 查看需要借助tensorboard, 命令如下: tensorboard --logdir="z://tmp/mnist_logs"
+        summary_writer.add_summary(summary_str, i * batch_num + batch)
+
+    print("test accuracy:", sess.run(accuracy, {x: mnist.test.images, y_: mnist.test.labels}))
+    print("train accuracy:", sess.run(accuracy, {x: batch_xs, y_: batch_ys}))
+    print("=====")
 
 # 计算识别测试集的准确度
 
